@@ -18,12 +18,19 @@
     "eject": "react-scripts eject",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
-    "format": "prettier --write \"**/*.jsx\""
+    "format": "prettier --write \"**/*.jsx\"",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
+    ]
+  },
+  "lint-staged": {
+    "src/*.{js,jsx}": [
+      "npm run lint:fix",
+      "npm run format"
     ]
   },
   "browserslist": {
@@ -49,6 +56,8 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "prettier": "^3.0.3"
+    "lint-staged": "^13.0.3",
+    "prettier": "^3.0.3",
+    "husky": "^8.0.0"
   }
 }
