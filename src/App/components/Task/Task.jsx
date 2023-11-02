@@ -12,18 +12,14 @@ export default class Task extends Component {
     };
   }
 
-  handleSubmit(e) {
+  handleSubmit = (e) => {
     e.preventDefault();
-    const {
-      editItem,
-      todoDataID: { id },
-    } = this.props;
+    const { editItem, id } = this.props;
 
     editItem(id, this.state.value);
 
-    this.setState({ value: '' });
-    this.setState({ edit: false });
-  }
+    this.setState({ value: '', edit: false });
+  };
 
   render() {
     const { label, active, id, date, deleteItem, toggleActive } = this.props;
@@ -55,7 +51,7 @@ export default class Task extends Component {
             className="icon icon-edit"
             onClick={() =>
               this.setState(({ edit }) => ({
-                editing: !edit,
+                edit: !edit,
                 value: this.props.label,
               }))
             }
@@ -65,7 +61,7 @@ export default class Task extends Component {
         </div>
 
         {this.state.edit && (
-          <form onSubmit={() => this.handleSubmit}>
+          <form onSubmit={this.handleSubmit}>
             <input
               type="text"
               className="edit"

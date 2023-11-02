@@ -90,10 +90,13 @@ export default class App extends Component {
     this.setState(({ edit }) => ({ edit: !edit }));
   };
 
-  editItem(ident, text) {
+  editItem = (elementID, text) => {
     this.setState(({ todoData }) => {
       const newTodoData = todoData.map((element) => {
-        if (element.id === ident) element.body = text;
+        if (element.id === elementID) {
+          return { ...element, label: text };
+        }
+
         return element;
       });
 
@@ -101,7 +104,7 @@ export default class App extends Component {
         todoData: newTodoData,
       };
     });
-  }
+  };
 
   render() {
     const activeItem = this.state.todoData.filter((el) => el.active);
