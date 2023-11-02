@@ -27,7 +27,6 @@
     "babelOptions": {
       "babelrc": false,
       "configFile": false,
-      // your babel options
       "presets": ["@babel/preset-react"]
     }
   },
@@ -38,7 +37,7 @@
     "prettier/prettier": "error",
     "linebreak-style": [0, "unix"],
     "quotes": ["error", "single"],
-    // "semi": ["error", "never"],
+    "semi": ["error", "never"],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": 0,
     "import/no-unresolved": [2, { "caseSensitive": false }],
