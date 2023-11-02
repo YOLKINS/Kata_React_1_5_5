@@ -1,14 +1,14 @@
-import React, { Component } from "react";
-import { formatDistanceToNow } from "date-fns";
-import KG from "date-fns/locale/en-AU";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import KG from 'date-fns/locale/en-AU';
+import PropTypes from 'prop-types';
 
 export default class Task extends Component {
   constructor() {
     super();
     this.state = {
       edit: false,
-      value: "",
+      value: '',
     };
   }
 
@@ -21,7 +21,7 @@ export default class Task extends Component {
 
     editItem(id, this.state.value);
 
-    this.setState({ value: "" });
+    this.setState({ value: '' });
     this.setState({ edit: false });
   }
 
@@ -29,17 +29,14 @@ export default class Task extends Component {
     const { label, active, id, date, deleteItem, toggleActive } = this.props;
 
     return (
-      <li
-        className={!active ? "completed" : this.state.edit ? "editing" : false}
-        id={id}
-      >
+      <li className={!active ? 'completed' : this.state.edit ? 'editing' : ''} id={id}>
         <div className="view">
           <input
             id={id}
             className="toggle"
             type="checkbox"
             onChange={(e) => toggleActive(id, e.target.checked)}
-            checked={active ? false : "checked"}
+            checked={active ? false : 'checked'}
           />
 
           <label htmlFor={id}>
@@ -64,11 +61,7 @@ export default class Task extends Component {
             }
           />
 
-          <button
-            type="button"
-            className="icon icon-destroy"
-            onClick={() => deleteItem(id)}
-          />
+          <button type="button" className="icon icon-destroy" onClick={() => deleteItem(id)} />
         </div>
 
         {this.state.edit && (
@@ -93,7 +86,7 @@ Task.propTypes = {
   date: PropTypes.instanceOf(Date),
 
   deleteItem: PropTypes.func.isRequired,
-  changeCheck: PropTypes.func.isRequired,
+  toggleActive: PropTypes.func.isRequired,
   editItem: PropTypes.func.isRequired,
 };
 

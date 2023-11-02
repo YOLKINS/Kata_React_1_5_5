@@ -1,16 +1,16 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import NewTaskForm from "./components/NewTaskForm/NewTaskForm";
-import TaskList from "./components/TaskList/TaskList";
-import Footer from "./components/Footer/Footer";
+import NewTaskForm from './components/NewTaskForm/NewTaskForm';
+import TaskList from './components/TaskList/TaskList';
+import Footer from './components/Footer/Footer';
 
-import "./App.css";
+import './App.css';
 
 export default class App extends Component {
   state = {
     todoData: [],
 
-    filter: "All",
+    filter: 'All',
   };
 
   createTodoItem(label) {
@@ -76,8 +76,8 @@ export default class App extends Component {
   filteredItems = () => {
     const { todoData, filter } = this.state;
     return todoData.filter(({ active }) => {
-      const all = filter === "All";
-      const completed = filter === "Completed";
+      const all = filter === 'All';
+      const completed = filter === 'Completed';
       return all ? true : completed ? active === false : active === true;
     });
   };
@@ -107,11 +107,7 @@ export default class App extends Component {
     const activeItem = this.state.todoData.filter((el) => el.active);
     return (
       <section className="todoapp">
-        <NewTaskForm
-          title="Todos"
-          placeholder="What needs to be done?"
-          addItem={this.addItem}
-        />
+        <NewTaskForm title="Todos" placeholder="What needs to be done?" addItem={this.addItem} />
         <TaskList
           todos={this.filteredItems()}
           toggleActive={this.toggleActive}

@@ -1,11 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class NewTaskForm extends React.Component {
   constructor() {
     super();
     this.state = {
-      label: "",
+      label: '',
     };
   }
 
@@ -18,7 +18,7 @@ export default class NewTaskForm extends React.Component {
   onSubmit = (e) => {
     e.preventDefault();
     this.props.addItem(this.state.label);
-    this.setState({ label: "" });
+    this.setState({ label: '' });
   };
 
   render() {
@@ -33,7 +33,6 @@ export default class NewTaskForm extends React.Component {
               placeholder={placeholder}
               onChange={this.onLabelChange}
               value={this.state.label}
-              autoFocus
             />
           </label>
         </form>
@@ -49,6 +48,6 @@ NewTaskForm.propTypes = {
 };
 
 NewTaskForm.defaultProps = {
-  placeholder: "What needs to be done?",
-  title: "Todos",
+  placeholder: 'What needs to be done?',
+  title: 'Todos',
 };

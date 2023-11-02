@@ -1,13 +1,14 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Task from "../Task/Task";
+import Task from '../Task/Task';
 
 export default class TaskList extends React.Component {
   render() {
     const elements = this.props.todos.map((item) => {
       return (
         <Task
+          key={item.id}
           {...item}
           todos={this.props.todos}
           toggleActive={this.props.toggleActive}

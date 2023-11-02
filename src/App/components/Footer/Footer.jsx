@@ -1,7 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import TaskFilter from "../TaskFilter/TaskFilter";
+import TaskFilter from '../TaskFilter/TaskFilter';
 
 export default class Footer extends React.Component {
   render() {
