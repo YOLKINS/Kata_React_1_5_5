@@ -17,8 +17,10 @@ export default class NewTaskForm extends React.Component {
 
   onSubmit = (e) => {
     e.preventDefault();
-    this.props.addItem(this.state.label);
-    this.setState({ label: '' });
+    if (this.state.label) {
+      this.props.addItem(this.state.label);
+      this.setState({ label: '' });
+    }
   };
 
   render() {
