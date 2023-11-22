@@ -3,6 +3,8 @@ import { formatDistanceToNow } from 'date-fns';
 import KG from 'date-fns/locale/en-AU';
 import PropTypes from 'prop-types';
 
+import AppTimer from '../Timer/timerA';
+
 export default class Task extends Component {
   constructor() {
     super();
@@ -22,7 +24,7 @@ export default class Task extends Component {
   };
 
   render() {
-    const { label, active, id, date, deleteItem, toggleActive } = this.props;
+    const { label, active, id, date, timer, deleteItem, toggleActive, isPaused, startTimer, pauseTimer } = this.props;
 
     return (
       <li className={!active ? 'completed' : this.state.edit ? 'editing' : ''} id={id}>
@@ -36,8 +38,9 @@ export default class Task extends Component {
           />
 
           <label htmlFor={id}>
-            <span className="description">{label}</span>
-            <span className="created">
+            <span className="title">{label}</span>
+            <AppTimer seconds={timer} id={id} isPaused={isPaused} startTimer={startTimer} pauseTimer={pauseTimer} />
+            <span className="description">
               {`created ${formatDistanceToNow(date, {
                 includeSeconds: true,
                 locale: KG,

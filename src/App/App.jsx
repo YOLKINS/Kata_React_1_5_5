@@ -13,14 +13,56 @@ export default class App extends Component {
     filter: 'All',
   };
 
-  createTodoItem(label) {
+  /*...................       TIMER        ................ */
+  startTimer = (id) => {
+    this.setState(
+      (prevState) => ({
+        todoData: prevState.todoData.map((task) =>
+          task.id === id && task.active && task.timer > 0 ? { ...task, isPaused: false } : task
+        ),
+      }),
+      () => {
+        const task = this.state.todoData.find((task) => task.id === id && task.active);
+        if (task) {
+          task.intervalId = this.createTimerInterval(id);
+        }
+      }
+    );
+  };
+
+  pauseTimer = (id) => {
+    this.setState((prevState) => ({
+      todoData: prevState.todoData.map((task) => (task.id === id && task.active ? { ...task, isPaused: true } : task)),
+    }));
+  };
+
+  createTimerInterval = (id) => {
+    return setInterval(() => {
+      this.setState((prevState) => ({
+        todoData: prevState.todoData.map((task) =>
+          task.id === id && task.active && !task.isPaused && task.timer >= 1 ? { ...task, timer: task.timer - 1 } : task
+        ),
+      }));
+    }, 1000);
+  };
+
+  componentWillUnmount() {
+    this.state.todoData.forEach((task) => {
+      clearInterval(task.intervalId);
+    });
+  }
+  /*...................       TIMER        ................ */
+
+  createTodoItem(label, count) {
     const date = new Date();
 
     return {
       label,
       active: true,
+      isPaused: true,
       id: label + date,
       date: date,
+      timer: count === 0 ? 'no' : count,
     };
   }
 
@@ -40,10 +82,19 @@ export default class App extends Component {
   };
 
   deleteItem = (id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
+    this.setState((prevState) => {
+      const idx = prevState.todoData.findIndex((el) => el.id === id);
 
-      const newData = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
+      if (idx === -1) {
+        return null;
+      }
+
+      const newData = [...prevState.todoData.slice(0, idx), ...prevState.todoData.slice(idx + 1)];
+
+      const deletedTask = prevState.todoData[idx];
+      if (deletedTask && deletedTask.intervalId) {
+        clearInterval(deletedTask.intervalId);
+      }
 
       return {
         todoData: newData,
@@ -51,8 +102,8 @@ export default class App extends Component {
     });
   };
 
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text);
+  addItem = (text, count) => {
+    const newItem = this.createTodoItem(text, count);
 
     this.setState(({ todoData }) => {
       const newArray = [...todoData, newItem];
@@ -116,6 +167,8 @@ export default class App extends Component {
           toggleActive={this.toggleActive}
           deleteItem={this.deleteItem}
           editItem={this.editItem}
+          startTimer={this.startTimer}
+          pauseTimer={this.pauseTimer}
         />
         <Footer
           changeFilter={this.changeFilter}

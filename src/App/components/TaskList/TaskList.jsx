@@ -14,6 +14,8 @@ export default class TaskList extends React.Component {
           toggleActive={this.props.toggleActive}
           deleteItem={this.props.deleteItem}
           editItem={this.props.editItem}
+          startTimer={this.props.startTimer}
+          pauseTimer={this.props.pauseTimer}
         />
       );
     });
