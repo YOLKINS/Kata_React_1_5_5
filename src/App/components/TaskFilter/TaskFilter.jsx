@@ -6,17 +6,21 @@ const TaskFilter = (props) => {
   return (
     <ul className="filters">
       <li>
-        <button type="button" className={filter === 'All' ? 'selected' : ''} onClick={changeFilter('All')}>
+        <button type="button" className={filter === 'All' ? 'selected' : ''} onClick={() => changeFilter('All')}>
           All
         </button>
       </li>
       <li>
-        <button type="button" className={filter === 'Active' ? 'selected' : ''} onClick={changeFilter('Active')}>
+        <button type="button" className={filter === 'Active' ? 'selected' : ''} onClick={() => changeFilter('Active')}>
           Active
         </button>
       </li>
       <li>
-        <button type="button" className={filter === 'Completed' ? 'selected' : ''} onClick={changeFilter('Completed')}>
+        <button
+          type="button"
+          className={filter === 'Completed' ? 'selected' : ''}
+          onClick={() => changeFilter('Completed')}
+        >
           Completed
         </button>
       </li>

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 import NewTaskForm from './components/NewTaskForm/NewTaskForm';
 import TaskList from './components/TaskList/TaskList';
@@ -6,56 +6,68 @@ import Footer from './components/Footer/Footer';
 
 import './App.css';
 
-export default class App extends Component {
-  state = {
-    todoData: [],
-
-    filter: 'All',
-  };
+const App = () => {
+  const [todoData, changeTodoData] = useState([]);
+  const [filter, setFilter] = useState('All');
 
   /*...................       TIMER        ................ */
-  startTimer = (id) => {
-    this.setState(
-      (prevState) => ({
-        todoData: prevState.todoData.map((task) =>
-          task.id === id && task.active && task.timer > 0 ? { ...task, isPaused: false } : task
-        ),
-      }),
-      () => {
-        const task = this.state.todoData.find((task) => task.id === id && task.active);
-        if (task) {
-          task.intervalId = this.createTimerInterval(id);
-        }
-      }
-    );
-  };
+  const memoizedTodoData = useMemo(() => todoData, [todoData]);
 
-  pauseTimer = (id) => {
-    this.setState((prevState) => ({
-      todoData: prevState.todoData.map((task) => (task.id === id && task.active ? { ...task, isPaused: true } : task)),
-    }));
-  };
+  const createTimerInterval = useCallback(
+    (id) => {
+      return setInterval(() => {
+        changeTodoData((prevTodoData) => {
+          const newTodoData = prevTodoData.map((task) =>
+            task.id === id && task.active && !task.isPaused && task.timer > 0
+              ? { ...task, timer: task.timer - 1 }
+              : task
+          );
+          return newTodoData;
+        });
+      }, 1000);
+    },
+    [changeTodoData]
+  );
 
-  createTimerInterval = (id) => {
-    return setInterval(() => {
-      this.setState((prevState) => ({
-        todoData: prevState.todoData.map((task) =>
-          task.id === id && task.active && !task.isPaused && task.timer >= 1 ? { ...task, timer: task.timer - 1 } : task
-        ),
-      }));
-    }, 1000);
-  };
+  const startTimer = useCallback(
+    (id) => {
+      changeTodoData((prevTodoData) => {
+        const newTodoData = prevTodoData.map((task) =>
+          task.id === id && task.active && task.timer > 0
+            ? { ...task, isPaused: false, intervalId: createTimerInterval(id) }
+            : task
+        );
 
-  componentWillUnmount() {
-    this.state.todoData.forEach((task) => {
-      clearInterval(task.intervalId);
-    });
-  }
+        return newTodoData;
+      });
+    },
+    [changeTodoData, createTimerInterval]
+  );
+
+  const pauseTimer = useCallback(
+    (id) => {
+      changeTodoData((prevTodoData) => {
+        const newTodoData = prevTodoData.map((task) =>
+          task.id === id && task.active ? { ...task, isPaused: true } : task
+        );
+        return newTodoData;
+      });
+    },
+    [changeTodoData]
+  );
+
+  useEffect(() => {
+    return () => {
+      memoizedTodoData.forEach((task) => {
+        clearInterval(task.intervalId);
+      });
+    };
+  }, [memoizedTodoData]);
+
   /*...................       TIMER        ................ */
 
-  createTodoItem(label, count) {
+  const createTodoItem = (label, count) => {
     const date = new Date();
-
     return {
       label,
       active: true,
@@ -64,68 +76,54 @@ export default class App extends Component {
       date: date,
       timer: count === 0 ? 'no' : count,
     };
-  }
+  };
 
-  toggleActive = (id) => {
-    this.setState((prevState) => {
-      const updatedTodoData = prevState.todoData.map((item) => {
+  const toggleActive = (id) => {
+    changeTodoData((prevTodoData) => {
+      const updatedTodoData = prevTodoData.map((item) => {
         if (item.id === id) {
           return { ...item, active: !item.active };
         }
         return item;
       });
 
-      return {
-        todoData: updatedTodoData,
-      };
+      return updatedTodoData;
     });
   };
 
-  deleteItem = (id) => {
-    this.setState((prevState) => {
-      const idx = prevState.todoData.findIndex((el) => el.id === id);
-
+  const deleteItem = (id) => {
+    changeTodoData((prevTodoData) => {
+      const idx = prevTodoData.findIndex((el) => el.id === id);
       if (idx === -1) {
         return null;
       }
-
-      const newData = [...prevState.todoData.slice(0, idx), ...prevState.todoData.slice(idx + 1)];
-
-      const deletedTask = prevState.todoData[idx];
+      const newData = [...prevTodoData.slice(0, idx), ...prevTodoData.slice(idx + 1)];
+      const deletedTask = prevTodoData[idx];
       if (deletedTask && deletedTask.intervalId) {
         clearInterval(deletedTask.intervalId);
       }
 
-      return {
-        todoData: newData,
-      };
+      return newData;
     });
   };
 
-  addItem = (text, count) => {
-    const newItem = this.createTodoItem(text, count);
+  const addItem = (text, count) => {
+    const newItem = createTodoItem(text, count);
 
-    this.setState(({ todoData }) => {
-      const newArray = [...todoData, newItem];
-
-      return {
-        todoData: newArray,
-      };
+    changeTodoData((prevTodoData) => {
+      const newArray = [...prevTodoData, newItem];
+      return newArray;
     });
   };
 
-  deleteItems = () => {
-    this.setState(({ todoData }) => {
-      const newArray = todoData.filter((el) => el.active);
-
-      return {
-        todoData: newArray,
-      };
+  const deleteItems = () => {
+    changeTodoData((prevTodoData) => {
+      const newArray = prevTodoData.filter((el) => el.active);
+      return newArray;
     });
   };
 
-  filteredItems = () => {
-    const { todoData, filter } = this.state;
+  const filteredItems = () => {
     return todoData.filter(({ active }) => {
       const all = filter === 'All';
       const completed = filter === 'Completed';
@@ -133,50 +131,38 @@ export default class App extends Component {
     });
   };
 
-  changeFilter = (value) => {
-    this.setState({ filter: value });
+  const changeFilter = (value) => {
+    setFilter(value);
   };
 
-  editToggle = () => {
-    this.setState(({ edit }) => ({ edit: !edit }));
-  };
-
-  editItem = (elementID, text) => {
-    this.setState(({ todoData }) => {
-      const newTodoData = todoData.map((element) => {
+  const editItem = (elementID, text) => {
+    changeTodoData((prevTodoData) => {
+      const newTodoData = prevTodoData.map((element) => {
         if (element.id === elementID) {
           return { ...element, label: text };
         }
 
         return element;
       });
-
-      return {
-        todoData: newTodoData,
-      };
+      return newTodoData;
     });
   };
 
-  render() {
-    const activeItem = this.state.todoData.filter((el) => el.active);
-    return (
-      <section className="todoapp">
-        <NewTaskForm title="Todos" placeholder="What needs to be done?" addItem={this.addItem} />
-        <TaskList
-          todos={this.filteredItems()}
-          toggleActive={this.toggleActive}
-          deleteItem={this.deleteItem}
-          editItem={this.editItem}
-          startTimer={this.startTimer}
-          pauseTimer={this.pauseTimer}
-        />
-        <Footer
-          changeFilter={this.changeFilter}
-          deleteItems={this.deleteItems}
-          activeItem={activeItem}
-          filter={this.state.filter}
-        />
-      </section>
-    );
-  }
-}
+  const activeItem = todoData.filter((el) => el.active);
+  return (
+    <section className="todoapp">
+      <NewTaskForm title="Todos" placeholder="What needs to be done?" addItem={addItem} />
+      <TaskList
+        todos={filteredItems()}
+        toggleActive={toggleActive}
+        deleteItem={deleteItem}
+        editItem={editItem}
+        startTimer={startTimer}
+        pauseTimer={pauseTimer}
+      />
+      <Footer changeFilter={changeFilter} deleteItems={deleteItems} activeItem={activeItem} filter={filter} />
+    </section>
+  );
+};
+
+export default App;
