@@ -1,49 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-export default class NewTaskForm extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      label: '',
-      min: '',
-      sec: '',
-    };
-  }
+const NewTaskForm = (props) => {
+  const { placeholder, title } = props;
 
-  onMinChange = (e) => {
+  const [label, setLabel] = useState('');
+  const [min, setMin] = useState('');
+  const [sec, setSec] = useState('');
+
+  const onMinChange = (e) => {
     const value = e.target.value;
     if (!isNaN(value) || value === '') {
-      this.setState({
-        min: value,
-      });
+      setMin(value);
     }
   };
 
-  onSecChange = (e) => {
+  const onSecChange = (e) => {
     const value = e.target.value;
     if (!isNaN(value) || value === '') {
-      this.setState({
-        sec: value,
-      });
+      setSec(value);
     }
   };
 
-  onLabelChange = (e) => {
-    this.setState({
-      label: e.target.value,
-    });
+  const onLabelChange = (e) => {
+    const value = e.target.value;
+    setLabel(value);
   };
 
-  onKeyDown = (e) => {
+  const onKeyDown = (e) => {
     if (e.key === 'Enter') {
-      this.onSubmit(e);
+      onSubmit(e);
     }
   };
 
-  onSubmit = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-    const { label, min, sec } = this.state;
     let count = 0;
     if (label) {
       if (min !== '') {
@@ -53,45 +44,43 @@ export default class NewTaskForm extends React.Component {
         count += parseInt(sec, 10);
       }
       console.log(count);
-      this.props.addItem(label, count);
-      this.setState({ label: '', min: '', sec: '' });
+      props.addItem(label, count);
+      setLabel('');
+      setMin('');
+      setSec('');
     }
   };
-
-  render() {
-    const { placeholder, title } = this.props;
-    return (
-      <header className="header">
-        <h1>{title}</h1>
-        <form className="new-todo-form" onSubmit={this.onSubmit}>
-          <label>
-            <input
-              className="new-todo"
-              placeholder={placeholder}
-              onKeyDown={this.onKeyDown}
-              onChange={this.onLabelChange}
-              value={this.state.label}
-            />
-            <input
-              className="new-todo-form__timer"
-              placeholder="Min"
-              onKeyDown={this.onKeyDown}
-              onChange={this.onMinChange}
-              value={this.state.min}
-            />
-            <input
-              className="new-todo-form__timer"
-              placeholder="Sec"
-              onKeyDown={this.onKeyDown}
-              onChange={this.onSecChange}
-              value={this.state.sec}
-            />
-          </label>
-        </form>
-      </header>
-    );
-  }
-}
+  return (
+    <header className="header">
+      <h1>{title}</h1>
+      <form className="new-todo-form" onSubmit={onSubmit}>
+        <label>
+          <input
+            className="new-todo"
+            placeholder={placeholder}
+            onKeyDown={onKeyDown}
+            onChange={onLabelChange}
+            value={label}
+          />
+          <input
+            className="new-todo-form__timer"
+            placeholder="Min"
+            onKeyDown={onKeyDown}
+            onChange={onMinChange}
+            value={min}
+          />
+          <input
+            className="new-todo-form__timer"
+            placeholder="Sec"
+            onKeyDown={onKeyDown}
+            onChange={onSecChange}
+            value={sec}
+          />
+        </label>
+      </form>
+    </header>
+  );
+};
 
 NewTaskForm.propTypes = {
   placeholder: PropTypes.string,
@@ -103,3 +92,5 @@ NewTaskForm.defaultProps = {
   placeholder: 'What needs to be done?',
   title: 'Todos',
 };
+
+export default NewTaskForm;
