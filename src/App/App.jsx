@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 import NewTaskForm from './components/NewTaskForm/NewTaskForm';
 import TaskList from './components/TaskList/TaskList';
@@ -15,13 +15,11 @@ const App = () => {
     (id) => {
       return setInterval(() => {
         changeTodoData((prevTodoData) => {
-          console.log('before', prevTodoData);
           const newTodoData = prevTodoData.map((task) =>
             task.id === id && task.active && !task.isPaused && task.timer > 0
               ? { ...task, timer: task.timer - 1 }
               : task
           );
-          console.log('before', newTodoData);
           return newTodoData;
         });
       }, 1000);
@@ -29,29 +27,41 @@ const App = () => {
     [changeTodoData]
   );
 
-  const startTimer = (id) => {
-    changeTodoData((prevTodoData) => {
-      return prevTodoData.map((task) =>
-        task.id === id && task.active && task.timer > 0 && !task.intervalId
-          ? { ...task, isPaused: false, intervalId: createTimerInterval(id) }
-          : task
-      );
-    });
-  };
+  const startTimer = useCallback(
+    (id) => {
+      changeTodoData((prevTodoData) => {
+        const newTodoData = prevTodoData.map((task) =>
+          task.id === id && task.active && task.timer > 0 && !task.intervalId
+            ? { ...task, isPaused: false, intervalId: createTimerInterval(id) }
+            : task
+        );
+        return newTodoData;
+      });
+    },
+    [changeTodoData, createTimerInterval]
+  );
 
-  const pauseTimer = (id) => {
-    changeTodoData((prevTodoData) => {
-      return prevTodoData.map((task) => (task.id === id && task.active ? { ...task, isPaused: true } : task));
-    });
-  };
+  const pauseTimer = useCallback(
+    (id) => {
+      changeTodoData((prevTodoData) => {
+        const newTodoData = prevTodoData.map((task) =>
+          task.id === id && task.active ? { ...task, isPaused: true } : task
+        );
+        return newTodoData;
+      });
+    },
+    [changeTodoData]
+  );
 
   useEffect(() => {
     return () => {
-      todoData.forEach((task) => {
+      memoizedTodoData.forEach((task) => {
         clearInterval(task.intervalId);
       });
     };
-  }, [todoData]);
+  }, [memoizedTodoData]);
+
+  const memoizedTodoData = useMemo(() => todoData, [todoData]);
 
   /*...................       TIMER        ................ */
 
