@@ -11,6 +11,7 @@ const App = () => {
   const [filter, setFilter] = useState('All');
 
   /*...................       TIMER        ................ */
+
   const memoizedTodoData = useMemo(() => todoData, [todoData]);
 
   const createTimerInterval = useCallback(
@@ -32,13 +33,18 @@ const App = () => {
   const startTimer = useCallback(
     (id) => {
       changeTodoData((prevTodoData) => {
-        const newTodoData = prevTodoData.map((task) =>
-          task.id === id && task.active && task.timer > 0
-            ? { ...task, isPaused: false, intervalId: createTimerInterval(id) }
-            : task
-        );
+        const taskIndex = prevTodoData.findIndex((task) => task.id === id);
+        if (taskIndex === -1) return prevTodoData;
 
-        return newTodoData;
+        const task = prevTodoData[taskIndex];
+
+        if (task.active && task.timer > 0 && !task.intervalId) {
+          const newTodoData = [...prevTodoData];
+          newTodoData[taskIndex] = { ...task, isPaused: false, intervalId: createTimerInterval(id) };
+          return newTodoData;
+        }
+
+        return prevTodoData;
       });
     },
     [changeTodoData, createTimerInterval]
@@ -47,27 +53,37 @@ const App = () => {
   const pauseTimer = useCallback(
     (id) => {
       changeTodoData((prevTodoData) => {
-        const newTodoData = prevTodoData.map((task) =>
-          task.id === id && task.active ? { ...task, isPaused: true } : task
-        );
-        return newTodoData;
+        const taskIndex = prevTodoData.findIndex((task) => task.id === id);
+        if (taskIndex === -1) return prevTodoData;
+
+        const task = prevTodoData[taskIndex];
+
+        if (task.active && task.intervalId) {
+          clearInterval(task.intervalId);
+          const newTodoData = [...prevTodoData];
+          newTodoData[taskIndex] = { ...task, isPaused: true, intervalId: null };
+          return newTodoData;
+        }
+
+        return prevTodoData;
       });
     },
     [changeTodoData]
   );
 
   useEffect(() => {
-    return () => {
-      memoizedTodoData.forEach((task) => {
+    memoizedTodoData.forEach((task) => {
+      if (task.intervalId) {
         clearInterval(task.intervalId);
-      });
-    };
+      }
+    });
   }, [memoizedTodoData]);
 
   /*...................       TIMER        ................ */
 
   const createTodoItem = (label, count) => {
     const date = new Date();
+
     return {
       label,
       active: true,
