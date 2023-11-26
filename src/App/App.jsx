@@ -54,10 +54,10 @@ const App = () => {
   );
 
   useEffect(() => {
+    const intervalIds = memoizedTodoData.filter((task) => task.intervalId).map((task) => task.intervalId);
+
     return () => {
-      memoizedTodoData.forEach((task) => {
-        clearInterval(task.intervalId);
-      });
+      intervalIds.forEach((intervalId) => clearInterval(intervalId));
     };
   }, [memoizedTodoData]);
 
