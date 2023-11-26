@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import NewTaskForm from './components/NewTaskForm/NewTaskForm';
 import TaskList from './components/TaskList/TaskList';
@@ -10,6 +10,7 @@ import './App.css';
 const App = () => {
   const [todoData, changeTodoData] = useState([]);
   const [filter, setFilter] = useState('All');
+  const intervalRefs = useRef({});
 
   const createTimerInterval = useCallback(
     (id) => {
@@ -27,18 +28,30 @@ const App = () => {
     [changeTodoData]
   );
 
+  useEffect(() => {
+    Object.values(intervalRefs.current).forEach((intervalId) => clearInterval(intervalId));
+
+    todoData.forEach((task) => {
+      if (task.active && !task.isPaused && task.timer > 0) {
+        intervalRefs.current[task.id] = createTimerInterval(task.id);
+      }
+    });
+
+    return () => {
+      Object.values(intervalRefs.current).forEach((intervalId) => clearInterval(intervalId));
+    };
+  }, [todoData, createTimerInterval]);
+
   const startTimer = useCallback(
     (id) => {
       changeTodoData((prevTodoData) => {
         const newTodoData = prevTodoData.map((task) =>
-          task.id === id && task.active && task.timer > 0 && !task.intervalId
-            ? { ...task, isPaused: false, intervalId: createTimerInterval(id) }
-            : task
+          task.id === id && task.active && task.timer > 0 ? { ...task, isPaused: false } : task
         );
         return newTodoData;
       });
     },
-    [changeTodoData, createTimerInterval]
+    [changeTodoData]
   );
 
   const pauseTimer = useCallback(
@@ -52,16 +65,6 @@ const App = () => {
     },
     [changeTodoData]
   );
-
-  useEffect(() => {
-    const intervalIds = memoizedTodoData.filter((task) => task.intervalId).map((task) => task.intervalId);
-
-    return () => {
-      intervalIds.forEach((intervalId) => clearInterval(intervalId));
-    };
-  }, [memoizedTodoData]);
-
-  const memoizedTodoData = useMemo(() => todoData, [todoData]);
 
   /*...................       TIMER        ................ */
 
