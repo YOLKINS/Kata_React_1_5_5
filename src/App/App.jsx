@@ -24,6 +24,7 @@ export default class App extends Component {
       () => {
         const task = this.state.todoData.find((task) => task.id === id && task.active);
         if (task) {
+          clearInterval(task.intervalId); // Остановка предыдущего интервала, если он существует
           task.intervalId = this.createTimerInterval(id);
         }
       }
@@ -34,6 +35,7 @@ export default class App extends Component {
     this.setState((prevState) => ({
       todoData: prevState.todoData.map((task) => (task.id === id && task.active ? { ...task, isPaused: true } : task)),
     }));
+    clearInterval(this.state.todoData.find((task) => task.id === id && task.active)?.intervalId);
   };
 
   createTimerInterval = (id) => {
